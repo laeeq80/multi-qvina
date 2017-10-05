@@ -93,20 +93,20 @@ struct model {
 
 	void write_flex  (                  const path& name, const std::string& remark) const { write_context(flex_context, name, remark); }
 	void write_ligand(sz ligand_number, const path& name, const std::string& remark) const { VINA_CHECK(ligand_number < ligands.size()); write_context(ligands[ligand_number].cont, name, remark); }
-	void write_structure(ofile& out) const {
+	void write_structure() const {
 		VINA_FOR_IN(i, ligands)
 			write_context(ligands[i].cont);
 		if(num_flex() > 0) // otherwise remark is written in vain
 			write_context(flex_context);
 	}
-	void write_structure(ofile& out, const std::string& remark) const {
+	void write_structure(const std::string& remark) const {
 		std::cout << remark;
-		write_structure(out);
+		write_structure();
 	}
-	void write_structure(const path& name) const { ofile out(name); write_structure(out); }
-	void write_model(ofile& out, sz model_number, const std::string& remark) const {
+	void write_structure(const path& name) const { ofile out(name); write_structure(); }
+	void write_model(sz model_number, const std::string& remark) const {
 		std::cout << "MODEL" << '\n';
-		write_structure(out, remark);
+		write_structure(remark);
 		std::cout << "ENDMDL\n";
 	}
 	void seti(const conf& c);
