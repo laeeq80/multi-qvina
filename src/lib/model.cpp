@@ -562,10 +562,10 @@ void model::write_context(const context& c, ofile& out) const {
 	VINA_FOR_IN(i, c) {
 		const std::string& str = c[i].first;
 		if(c[i].second) {
-			out << coords_to_pdbqt_string(coords[c[i].second.get()], str) << '\n';
+			std::cout << coords_to_pdbqt_string(coords[c[i].second.get()], str) << '\n';
 		}
 		else
-			out << str << '\n';
+			std::cout << str << '\n';
 	}
 }
 

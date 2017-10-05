@@ -98,10 +98,10 @@ void do_randomization(model& m,
 					  const vec& corner1, const vec& corner2, int seed, int verbosity, tee& log) {
 	conf init_conf = m.get_initial_conf();
 	rng generator(static_cast<rng::result_type>(seed));
-	if(verbosity > 1) {
+	/*if(verbosity > 1) {
 		log << "Using random seed: " << seed;
 		log.endl();
-	}
+	}*/
 	const sz attempts = 10000;
 	conf best_conf = init_conf;
 	fl best_clash_penalty = 0;
@@ -217,19 +217,19 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 	}
 	else {
 		rng generator(static_cast<rng::result_type>(seed));
-		log << "Using random seed: " << seed;
-		log.endl();
+		//log << "Using random seed: " << seed;
+		//log.endl();
 		output_container out_cont;
 
 //		time_t start,end;
-		doing(verbosity, "Performing search", log);
+		//doing(verbosity, "Performing search", log);
 		ptime time_start(microsec_clock::local_time());
 //		time(&start);
 
 		par(m, out_cont, prec, ig, prec_widened, ig_widened, corner1, corner2, generator);
-		done(verbosity, log);
+		//done(verbosity, log);
 
-		doing(verbosity, "Refining results", log);
+		//doing(verbosity, "Refining results", log);
 		VINA_FOR_IN(i, out_cont)
 			refine_structure(m, prec, nc, out_cont[i], authentic_v, par.mc.ssd_par.evals);
 
@@ -252,15 +252,15 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 		const fl out_min_rmsd = 1;
 		out_cont = remove_redundant(out_cont, out_min_rmsd);
 
-		done(verbosity, log);
-
+		//done(verbosity, log);
+/*
 		log.setf(std::ios::fixed, std::ios::floatfield);
 		log.setf(std::ios::showpoint);
 		log << '\n';
 		log << "mode |   affinity | dist from best mode\n";
 		log << "     | (kcal/mol) | rmsd l.b.| rmsd u.b.\n";
 		log << "-----+------------+----------+----------\n";
-
+*/
 		model best_mode_model = m;
 		if(!out_cont.empty())
 			best_mode_model.set(out_cont.front().c);
@@ -270,21 +270,21 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 		VINA_FOR_IN(i, out_cont) {
 			if(how_many >= num_modes || !not_max(out_cont[i].e) || out_cont[i].e > out_cont[0].e + energy_range) break; // check energy_range sanity FIXME
 			++how_many;
-			log << std::setw(4) << i+1
-				<< "    " << std::setw(9) << std::setprecision(1) << out_cont[i].e; // intermolecular_energies[i];
+			//log << std::setw(4) << i+1
+				//<< "    " << std::setw(9) << std::setprecision(1) << out_cont[i].e; // intermolecular_energies[i];
 			m.set(out_cont[i].c);
 			const model& r = ref ? ref.get() : best_mode_model;
 			const fl lb = m.rmsd_lower_bound(r);
 			const fl ub = m.rmsd_upper_bound(r);
-			log << "  " << std::setw(9) << std::setprecision(3) << lb
-			    << "  " << std::setw(9) << std::setprecision(3) << ub; // FIXME need user-readable error messages in case of failures
+			//log << "  " << std::setw(9) << std::setprecision(3) << lb
+			    //<< "  " << std::setw(9) << std::setprecision(3) << ub; // FIXME need user-readable error messages in case of failures
 
 			remarks.push_back(vina_remark(out_cont[i].e, lb, ub));
-			log.endl();
+			//log.endl();
 		}
-		doing(verbosity, "Writing output", log);
+		//doing(verbosity, "Writing output", log);
 		write_all_output(m, out_cont, how_many, out_name, remarks);
-		done(verbosity, log);
+		//done(verbosity, log);
 
 		if(how_many < 1) {
 			log << "WARNING: Could not find any conformations completely within the search space.\n"
@@ -301,7 +301,7 @@ void main_procedure(model& m, const boost::optional<model>& ref, // m is non-con
 				 const flv& weights,
 				 int cpu, int seed, int verbosity, sz num_modes, fl energy_range, tee& log) {
 
-	doing(verbosity, "Setting up the scoring function", log);
+	//doing(verbosity, "Setting up the scoring function", log);
 
 	everything t;
 	VINA_CHECK(weights.size() == 6);
@@ -312,7 +312,7 @@ void main_procedure(model& m, const boost::optional<model>& ref, // m is non-con
 	const fl right = 0.25;
 	precalculate prec_widened(prec); prec_widened.widen(left, right);
 
-	done(verbosity, log);
+	//done(verbosity, log);
 
 	vec corner1(gd[0].begin, gd[1].begin, gd[2].begin);
 	vec corner2(gd[0].end,   gd[1].end,   gd[2].end);
@@ -345,10 +345,10 @@ void main_procedure(model& m, const boost::optional<model>& ref, // m is non-con
 		}
 		else {
 			bool cache_needed = !(score_only || randomize_only || local_only);
-			if(cache_needed) doing(verbosity, "Analyzing the binding site", log);
+			//if(cache_needed) doing(verbosity, "Analyzing the binding site", log);
 			cache c("scoring_function_version001", gd, slope, atom_type::XS);
 			if(cache_needed) c.populate(m, prec, m.get_movable_atom_types(prec.atom_typing_used()));
-			if(cache_needed) done(verbosity, log);
+			//if(cache_needed) done(verbosity, log);
 			do_search(m, ref, wt, prec, c, prec, c, nc,
 					  out_name,
 					  corner1, corner2,
@@ -700,7 +700,7 @@ Thank you!\n";
 		if(output_produced) { // FIXME
 			if(!vm.count("out")) {
 				out_name = default_output(ligand_name);
-				log << "Output will be " << out_name << '\n';
+				//log << "Output will be " << out_name << '\n';
 			}
 		}
 
@@ -727,12 +727,12 @@ Thank you!\n";
 		}
 		if(vm.count("cpu") == 0) {
 			unsigned num_cpus = boost::thread::hardware_concurrency();
-			if(verbosity > 1) {
+		/*	if(verbosity > 1) {
 				if(num_cpus > 0)
 					log << "Detected " << num_cpus << " CPU" << ((num_cpus > 1) ? "s" : "") << '\n';
 				else
 					log << "Could not detect the number of CPUs, using 1\n";
-			}
+			}*/
 			if(num_cpus > 0)
 				cpu = num_cpus;
 			else
@@ -743,7 +743,7 @@ Thank you!\n";
 		if(verbosity > 1 && exhaustiveness < cpu)
 			log << "WARNING: at low exhaustiveness, it may be impossible to utilize all CPUs\n";
 
-		doing(verbosity, "Reading input", log);
+		//doing(verbosity, "Reading input", log);
 
 		//Using Splitting code here
 				const split_models& split_models = parse_multimodel_pdbqt(ligand_name);
@@ -753,7 +753,7 @@ Thank you!\n";
 					model m       = parse_bundle(rigid_name, flex_name_opt, it->ligand);
 
 					boost::optional<model> ref;
-					done(verbosity, log);
+					//done(verbosity, log);
 
 					main_procedure(m, ref,
 							out_name,

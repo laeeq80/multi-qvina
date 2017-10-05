@@ -100,14 +100,14 @@ struct model {
 			write_context(flex_context, out);
 	}
 	void write_structure(ofile& out, const std::string& remark) const {
-		out << remark;
+		std::cout << remark;
 		write_structure(out);
 	}
 	void write_structure(const path& name) const { ofile out(name); write_structure(out); }
 	void write_model(ofile& out, sz model_number, const std::string& remark) const {
-		out << "MODEL " << model_number << '\n';
+		std::cout << "MODEL" << '\n';
 		write_structure(out, remark);
-		out << "ENDMDL\n";
+		std::cout << "ENDMDL\n";
 	}
 	void seti(const conf& c);
 	void sete(const conf& c);
