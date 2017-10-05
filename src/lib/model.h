@@ -109,6 +109,7 @@ struct model {
 		write_structure(remark);
 		std::cout << "ENDMDL\n";
 	}
+
 	void seti(const conf& c);
 	void sete(const conf& c);
 	void set (const conf& c);
