@@ -37,6 +37,16 @@ private:
 	parse_error_ligand() {}
 };
 
+struct parse_error_new {
+	strl ligand;
+	unsigned line;
+	std::string reason;
+	parse_error_new(unsigned line_, const std::string& reason_ = "") : line(line_), reason(reason_) {}
+private:
+	parse_error_new() {}
+};
+
+
 
 #endif
 
