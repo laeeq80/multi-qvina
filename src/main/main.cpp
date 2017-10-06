@@ -239,7 +239,7 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 		time_duration duration(time_end - time_start);
 //		time(&end);
 //		printf("\nsearching finished in %.3lf seconds\n",difftime(end,start));
-		printf("\nsearching finished in %.3lf seconds\n",(duration.total_milliseconds()/1000.0));
+		//printf("\nsearching finished in %.3lf seconds\n",(duration.total_milliseconds()/1000.0));
 
 		if(!out_cont.empty()) {
 			out_cont.sort();
@@ -508,7 +508,7 @@ your problem report:\n\
 \n\
 Thank you!\n";
 
-	const std::string cite_message = "\
+	//const std::string cite_message = "\
 ############################################################################\n\
 # If you used Quick Vina 2 in your work, please cite:                      #\n\
 #                                                                          #\n\
@@ -696,7 +696,7 @@ Thank you!\n";
 				throw usage_error("Search space dimensions should be positive");
 		}
 
-		log << cite_message << '\n';
+		//log << cite_message << '\n';
 
 		if(search_box_needed && size_x * size_y * size_z > 27e3) {
 			log << "WARNING: The search space volume > 27000 Angstrom^3 (See FAQ)\n";
