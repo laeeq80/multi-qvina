@@ -81,7 +81,7 @@ std::string default_output(const std::string& input_name) {
 }
 
 void write_all_output(model& m, const output_container& out, sz how_many,
-				  const std::string& output_name,
+				  //const std::string& output_name,
 				  const std::vector<std::string>& remarks) {
 	if(out.size() < how_many)
 		how_many = out.size();
@@ -94,7 +94,7 @@ void write_all_output(model& m, const output_container& out, sz how_many,
 }
 
 void do_randomization(model& m,
-					  const std::string& out_name,
+					  //const std::string& out_name,
 					  const vec& corner1, const vec& corner2, int seed, int verbosity, tee& log) {
 	conf init_conf = m.get_initial_conf();
 	rng generator(static_cast<rng::result_type>(seed));
@@ -120,7 +120,7 @@ void do_randomization(model& m,
 		log << "Clash penalty: " << best_clash_penalty; // FIXME rm?
 		log.endl();
 	}
-	m.write_structure(make_path(out_name));
+	m.write_structure();
 }
 
 void refine_structure(model& m, const precalculate& prec, non_cache& nc, output_type& out, const vec& cap, sz max_steps = 1000) {
@@ -161,7 +161,7 @@ output_container remove_redundant(const output_container& in, fl min_rmsd) {
 }
 
 void do_search(model& m, const boost::optional<model>& ref, const scoring_function& sf, const precalculate& prec, const igrid& ig, const precalculate& prec_widened, const igrid& ig_widened, non_cache& nc, // nc.slope is changed
-			   const std::string& out_name,
+			   //const std::string& out_name,
 			   const vec& corner1, const vec& corner2,
 			   const parallel_mc& par, fl energy_range, sz num_modes,
 			   int seed, int verbosity, bool score_only, bool local_only, tee& log, const terms& t, const flv& weights) {
@@ -212,7 +212,9 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 		output_container out_cont;
 		out_cont.push_back(new output_type(out));
 		std::vector<std::string> remarks(1, vina_remark(e, 0, 0));
-		write_all_output(m, out_cont, 1, out_name, remarks); // how_many == 1
+		write_all_output(m, out_cont, 1,
+				//out_name,
+				remarks); // how_many == 1
 		done(verbosity, log);
 	}
 	else {
@@ -283,7 +285,9 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 			//log.endl();
 		}
 		//doing(verbosity, "Writing output", log);
-		write_all_output(m, out_cont, how_many, out_name, remarks);
+		write_all_output(m, out_cont, how_many,
+				//out_name,
+				remarks);
 		//done(verbosity, log);
 
 		if(how_many < 1) {
@@ -295,7 +299,7 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 }
 
 void main_procedure(model& m, const boost::optional<model>& ref, // m is non-const (FIXME?)
-			     const std::string& out_name,
+			     //const std::string& out_name,
 				 bool score_only, bool local_only, bool randomize_only, bool no_cache,
 				 const grid_dims& gd, int exhaustiveness,
 				 const flv& weights,
@@ -330,15 +334,16 @@ void main_procedure(model& m, const boost::optional<model>& ref, // m is non-con
 
 	const fl slope = 1e6; // FIXME: too large? used to be 100
 	if(randomize_only) {
-		do_randomization(m, out_name,
-			             corner1, corner2, seed, verbosity, log);
+		do_randomization(m,
+				//out_name,
+			    corner1, corner2, seed, verbosity, log);
 	}
 	else {
 		non_cache nc        (m, gd, &prec,         slope); // if gd has 0 n's, this will not constrain anything
 		non_cache nc_widened(m, gd, &prec_widened, slope); // if gd has 0 n's, this will not constrain anything
 		if(no_cache) {
 			do_search(m, ref, wt, prec, nc, prec_widened, nc_widened, nc,
-					  out_name,
+					  //out_name,
 					  corner1, corner2,
 					  par, energy_range, num_modes,
 					  seed, verbosity, score_only, local_only, log, t, weights);
@@ -350,7 +355,7 @@ void main_procedure(model& m, const boost::optional<model>& ref, // m is non-con
 			if(cache_needed) c.populate(m, prec, m.get_movable_atom_types(prec.atom_typing_used()));
 			//if(cache_needed) done(verbosity, log);
 			do_search(m, ref, wt, prec, c, prec, c, nc,
-					  out_name,
+					  //out_name,
 					  corner1, corner2,
 					  par, energy_range, num_modes,
 					  seed, verbosity, score_only, local_only, log, t, weights);
@@ -430,42 +435,42 @@ model parse_bundle(const boost::optional<std::string>& rigid_name_opt, const boo
 
 //Code Added from split.cpp for Splitting the file into single molecules
 
-split_models parse_multimodel_pdbqt(const std::string& input) {
-	const path p = make_path(input);
-	ifile in(p);
+split_models parse_multimodel_pdbqt() {
+	//const path p = make_path(input);
+	//ifile in(p);
 	split_models tmp;
 	unsigned count = 0;
 	std::string str;
 	bool parsing_model = false;
 	bool parsing_ligand = true;
-	while(std::getline(in, str)) {
+	while(std::getline(std::cin, str)) {
 		++count;
 		if(starts_with(str, "MODEL")) {
 			if(parsing_model == true || parsing_ligand == false)
-				throw parse_error(p, count, "Misplaced MODEL tag");
+				throw parse_error_new(count, "Misplaced MODEL tag");
 			tmp.push_back(split_model());
 			parsing_model = true;
 		}
 		else if(starts_with(str, "ENDMDL")) {
 			if(parsing_model == false || parsing_ligand == false)
-				throw parse_error(p, count, "Misplaced ENDMDL tag");
+				throw parse_error_new(count, "Misplaced ENDMDL tag");
 			parsing_model = false;
 		}
 		else if(starts_with(str, "BEGIN_RES")) {
 			if(parsing_model == false || parsing_ligand == false)
-				throw parse_error(p, count, "Misplaced BEGIN_RES tag");
+				throw parse_error_new(count, "Misplaced BEGIN_RES tag");
 			parsing_ligand = false;
 			tmp.back().flex.push_back(str);
 		}
 		else if(starts_with(str, "END_RES")) {
 			if(parsing_model == false || parsing_ligand == true)
-				throw parse_error(p, count, "Misplaced END_RES tag");
+				throw parse_error_new(count, "Misplaced END_RES tag");
 			parsing_ligand = true;
 			tmp.back().flex.push_back(str);
 		}
 		else {
 			if(parsing_model == false)
-				throw parse_error(p, count, "Input occurs outside MODEL");
+				throw parse_error_new(count, "Input occurs outside MODEL");
 			if(parsing_ligand) {
 				tmp.back().ligand.push_back(str);
 			}
@@ -475,7 +480,7 @@ split_models parse_multimodel_pdbqt(const std::string& input) {
 		}
 	}
 	if(parsing_model == true)
-		throw parse_error(p, count+1, "Missing ENDMDL tag");
+		throw parse_error_new(count+1, "Missing ENDMDL tag");
 	return tmp;
 }
 
@@ -528,7 +533,7 @@ Thank you!\n";
 ############################################################################\n";
 
 	try {
-		std::string rigid_name, ligand_name, flex_name, config_name, out_name, log_name;
+		std::string rigid_name, /*ligand_name,*/ flex_name, config_name, /*out_name,*/ log_name;
 		fl center_x, center_y, center_z, size_x, size_y, size_z;
 		int cpu = 0, seed, exhaustiveness, verbosity = 2, num_modes = 9;
 		fl energy_range = 2.0;
@@ -548,7 +553,7 @@ Thank you!\n";
 		inputs.add_options()
 			("receptor", value<std::string>(&rigid_name), "rigid part of the receptor (PDBQT)")
 			("flex", value<std::string>(&flex_name), "flexible side chains, if any (PDBQT)")
-			("ligand", value<std::string>(&ligand_name), "ligand (PDBQT)")
+			//("ligand", value<std::string>(&ligand_name), "ligand (PDBQT)")
 		;
 		//options_description search_area("Search area (required, except with --score_only)");
 		options_description search_area("Search space (required)");
@@ -563,7 +568,7 @@ Thank you!\n";
 		//options_description outputs("Output prefixes (optional - by default, input names are stripped of .pdbqt\nare used as prefixes. _001.pdbqt, _002.pdbqt, etc. are appended to the prefixes to produce the output names");
 		options_description outputs("Output (optional)");
 		outputs.add_options()
-			("out", value<std::string>(&out_name), "output models (PDBQT), the default is chosen based on the ligand file name")
+			//("out", value<std::string>(&out_name), "output models (PDBQT), the default is chosen based on the ligand file name")
 			("log", value<std::string>(&log_name), "optionally, write log file")
 		;
 		options_description advanced("Advanced options (see the manual)");
@@ -642,7 +647,7 @@ Thank you!\n";
 		}
 
 		bool search_box_needed = !score_only; // randomize_only and local_only still need the search space
-		bool output_produced   = !score_only; 
+		//bool output_produced   = !score_only;
 		bool receptor_needed   = !randomize_only;
 
 		if(receptor_needed) {
@@ -651,10 +656,10 @@ Thank you!\n";
 				return 1;
 			}
 		}
-		if(vm.count("ligand") <= 0) {
+		/*if(vm.count("ligand") <= 0) {
 			std::cerr << "Missing ligand.\n" << "\nCorrect usage:\n" << desc_simple << '\n';
 			return 1;
-		}
+		}*/
 		if(cpu < 1) 
 			cpu = 1;
 		if(vm.count("seed") == 0) 
@@ -697,12 +702,12 @@ Thank you!\n";
 			log << "WARNING: The search space volume > 27000 Angstrom^3 (See FAQ)\n";
 		}
 
-		if(output_produced) { // FIXME
+		/*if(output_produced) { // FIXME
 			if(!vm.count("out")) {
 				out_name = default_output(ligand_name);
 				//log << "Output will be " << out_name << '\n';
 			}
-		}
+		}*/
 
 		grid_dims gd; // n's = 0 via default c'tor
 
@@ -746,7 +751,7 @@ Thank you!\n";
 		//doing(verbosity, "Reading input", log);
 
 		//Using Splitting code here
-				const split_models& split_models = parse_multimodel_pdbqt(ligand_name);
+				const split_models& split_models = parse_multimodel_pdbqt();
 				//pipe_multimodel_pdbqt(tmp); // Pipe all molecules one at a time
 
 				for(split_models::const_iterator it = split_models.begin(); it != split_models.end(); ++it) {
@@ -756,7 +761,7 @@ Thank you!\n";
 					//done(verbosity, log);
 
 					main_procedure(m, ref,
-							out_name,
+							//out_name,
 							score_only, local_only, randomize_only, false, // no_cache == false
 							gd, exhaustiveness,
 							weights,
