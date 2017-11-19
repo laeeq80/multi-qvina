@@ -1,7 +1,7 @@
-# Multi-QuickVina 2 #
+# Multi-QuickVina #
 
-Multi-vina is modified version of Autodock Vina so you can dock multiple ligands at a time which was not 
-possible by the original Autodock Vina. Now you won't need to use vina_split anymore to split the ligands 
+Multi-QuickVina is modified version of Autodock QuickVina 2 so you can dock multiple ligands at a time which was not 
+possible by the original Autodock Vina and Autodock QuickVina 2. Now you won't need to use vina_split anymore to split the ligands 
 as single ligands.
 
 AutoDock Vina is an open-source program for doing molecular docking. It was been designed and implemented by Dr. Oleg Trott in the Molecular Graphics Lab at The Scripps Research Institute. 
