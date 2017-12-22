@@ -6,6 +6,17 @@ as single ligands.
 
 AutoDock Vina is an open-source program for doing molecular docking. It was been designed and implemented by Dr. Oleg Trott in the Molecular Graphics Lab at The Scripps Research Institute. 
 
+# Build
+Install Boost and build multi-qvina with Boost using following commands
+
+`make`
+
+`makedepend`
+
+# Execution
+
+`./vina --receptor receptor.pdbqt --config conf.txt < conformers.pdbqt`
+
 
 # QuickVina 2
 Accurately speed up AutoDock Vina, the famous molecular docking tool.
