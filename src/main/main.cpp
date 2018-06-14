@@ -14,8 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   Author: Dr. Oleg Trott <ot14@columbia.edu>, 
-           The Olson Lab, 
+   Author: Dr. Oleg Trott <ot14@columbia.edu>,
+           The Olson Lab,
            The Scripps Research Institute
 
 */
@@ -50,7 +50,7 @@ using boost::filesystem::path;
 using namespace boost::posix_time;
 
 path make_path(const std::string& str) {
-	return path(str, boost::filesystem::native);
+	return path(str);
 }
 
 void doing(int verbosity, const std::string& str, tee& log) {
@@ -138,7 +138,7 @@ std::string vina_remark(fl e, fl lb, fl ub) {
 	std::ostringstream remark;
 	remark.setf(std::ios::fixed, std::ios::floatfield);
 	remark.setf(std::ios::showpoint);
-	remark << "REMARK VINA RESULT: " 
+	remark << "REMARK VINA RESULT: "
 		                << std::setw(9) << std::setprecision(1) << e
 	                    << "  " << std::setw(9) << std::setprecision(3) << lb
 						<< "  " << std::setw(9) << std::setprecision(3) << ub
@@ -237,7 +237,7 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 			const fl best_mode_intramolecular_energy = m.eval_intramolecular(prec, authentic_v, out_cont[0].c);
 			VINA_FOR_IN(i, out_cont)
 				if(not_max(out_cont[i].e))
-					out_cont[i].e = m.eval_adjusted(sf, prec, nc, authentic_v, out_cont[i].c, best_mode_intramolecular_energy); 
+					out_cont[i].e = m.eval_adjusted(sf, prec, nc, authentic_v, out_cont[i].c, best_mode_intramolecular_energy);
 			// the order must not change because of non-decreasing g (see paper), but we'll re-sort in case g is non strictly increasing
 			out_cont.sort();
 		}
@@ -301,7 +301,7 @@ void main_procedure(model& m, const boost::optional<model>& ref, // m is non-con
 
 	weighted_terms wt(&t, weights);
 	precalculate prec(wt);
-	const fl left  = 0.25; 
+	const fl left  = 0.25;
 	const fl right = 0.25;
 	precalculate prec_widened(prec); prec_widened.widen(left, right);
 
@@ -368,10 +368,10 @@ struct options_occurrence {
 
 options_occurrence get_occurrence(boost::program_options::variables_map& vm, boost::program_options::options_description& d) {
 	options_occurrence tmp;
-	VINA_FOR_IN(i, d.options()) 
-		if(vm.count((*d.options()[i]).long_name())) 
+	VINA_FOR_IN(i, d.options())
+		if(vm.count((*d.options()[i]).long_name()))
 			tmp.some = true;
-		else 
+		else
 			tmp.all = false;
 	return tmp;
 }
@@ -534,9 +534,9 @@ Thank you!\n";
 				.options(desc)
 				.style(command_line_style::default_style ^ command_line_style::allow_guessing)
 				.positional(positional)
-				.run(), 
+				.run(),
 				vm);
-			notify(vm); 
+			notify(vm);
 		}
 		catch(boost::program_options::error& e) {
 			std::cerr << "Command line parse error: " << e.what() << '\n' << "\nCorrect usage:\n" << desc_simple << '\n';
@@ -568,7 +568,7 @@ Thank you!\n";
 		}
 
 		bool search_box_needed = !score_only; // randomize_only and local_only still need the search space
-		bool output_produced   = !score_only; 
+		bool output_produced   = !score_only;
 		bool receptor_needed   = !randomize_only;
 
 		if(receptor_needed) {
@@ -581,16 +581,16 @@ Thank you!\n";
 			std::cerr << "Missing ligand.\n" << "\nCorrect usage:\n" << desc_simple << '\n';
 			return 1;
 		}
-		if(cpu < 1) 
+		if(cpu < 1)
 			cpu = 1;
-		if(vm.count("seed") == 0) 
+		if(vm.count("seed") == 0)
 			seed = auto_seed();
 		if(exhaustiveness < 1)
 			throw usage_error("exhaustiveness must be 1 or greater");
 		if(num_modes < 1)
 			throw usage_error("num_modes must be 1 or greater");
 		sz max_modes_sz = static_cast<sz>(num_modes);
-		
+
 		boost::optional<std::string> rigid_name_opt;
 		if(vm.count("receptor"))
 			rigid_name_opt = rigid_name;
@@ -606,7 +606,7 @@ Thank you!\n";
 		if(vm.count("log") > 0)
 			log.init(log_name);
 
-		if(search_box_needed) { 
+		if(search_box_needed) {
 			options_occurrence oo = get_occurrence(vm, search_area);
 			if(!oo.all) {
 				check_occurrence(vm, search_area);
@@ -640,7 +640,7 @@ Thank you!\n";
 		weights.push_back(weight_hydrogen);
 		weights.push_back(5 * weight_rot / 0.1 - 1); // linearly maps onto a different range, internally. see everything.cpp
 
-		if(search_box_needed) { 
+		if(search_box_needed) {
 			const fl granularity = 0.375;
 			vec span(size_x,   size_y,   size_z);
 			vec center(center_x, center_y, center_z);
@@ -664,7 +664,7 @@ Thank you!\n";
 			else
 				cpu = 1;
 		}
-		if(cpu < 1) 
+		if(cpu < 1)
 			cpu = 1;
 		if(verbosity > 1 && exhaustiveness < cpu)
 			log << "WARNING: at low exhaustiveness, it may be impossible to utilize all CPUs\n";
@@ -672,11 +672,11 @@ Thank you!\n";
 		doing(verbosity, "Reading input", log);
 
 		model m       = parse_bundle(rigid_name_opt, flex_name_opt, std::vector<std::string>(1, ligand_name));
-			
+
 		boost::optional<model> ref;
 		done(verbosity, log);
 
-		main_procedure(m, ref, 
+		main_procedure(m, ref,
 					out_name,
 					score_only, local_only, randomize_only, false, // no_cache == false
 					gd, exhaustiveness,
@@ -684,7 +684,7 @@ Thank you!\n";
 					cpu, seed, verbosity, max_modes_sz, energy_range, log);
 	}
 	catch(file_error& e) {
-		std::cerr << "\n\nError: could not open \"" << e.name.native_file_string() << "\" for " << (e.in ? "reading" : "writing") << ".\n";
+		std::cerr << "\n\nError: could not open \"" << e.name.string() << "\" for " << (e.in ? "reading" : "writing") << ".\n";
 		return 1;
 	}
 	catch(boost::filesystem::filesystem_error& e) {
@@ -696,7 +696,7 @@ Thank you!\n";
 		return 1;
 	}
 	catch(parse_error& e) {
-		std::cerr << "\n\nParse error on line " << e.line << " in file \"" << e.file.native_file_string() << "\": " << e.reason << '\n';
+		std::cerr << "\n\nParse error on line " << e.line << " in file \"" << e.file.string() << "\": " << e.reason << '\n';
 		return 1;
 	}
 	catch(std::bad_alloc&) {
@@ -706,9 +706,9 @@ Thank you!\n";
 
 	// Errors that shouldn't happen:
 
-	catch(std::exception& e) { 
+	catch(std::exception& e) {
 		std::cerr << "\n\nAn error occurred: " << e.what() << ". " << error_message;
-		return 1; 
+		return 1;
 	}
 	catch(internal_error& e) {
 		std::cerr << "\n\nAn internal error occurred in " << e.file << "(" << e.line << "). " << error_message;

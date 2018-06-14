@@ -14,8 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   Author: Dr. Oleg Trott <ot14@columbia.edu>, 
-           The Olson Lab, 
+   Author: Dr. Oleg Trott <ot14@columbia.edu>,
+           The Olson Lab,
            The Scripps Research Institute
 
 */
@@ -38,7 +38,7 @@
 using boost::filesystem::path;
 
 path make_path(const std::string& str) {
-	return path(str, boost::filesystem::native);
+	return path(str);
 }
 
 std::string default_prefix(const std::string& input_name, const std::string& add) {
@@ -72,7 +72,7 @@ models parse_multimodel_pdbqt(const std::string& input) {
 	while(std::getline(in, str)) {
 		++count;
 		if(starts_with(str, "MODEL")) {
-			if(parsing_model == true || parsing_ligand == false) 
+			if(parsing_model == true || parsing_ligand == false)
 				throw parse_error(p, count, "Misplaced MODEL tag");
 			tmp.push_back(model());
 			parsing_model = true;
@@ -175,9 +175,9 @@ Thank you!\n";
 				.options(desc)
 				.style(command_line_style::default_style ^ command_line_style::allow_guessing)
 				.positional(positional)
-				.run(), 
+				.run(),
 				vm);
-			notify(vm); 
+			notify(vm);
 		}
 		catch(boost::program_options::error& e) {
 			std::cerr << "Command line parse error: " << e.what() << '\n' << "\nCorrect usage:\n" << desc << '\n';
@@ -208,7 +208,7 @@ Thank you!\n";
 		write_multimodel_pdbqt(tmp, ligand_prefix, flex_prefix);
 	}
 	catch(file_error& e) {
-		std::cerr << "\n\nError: could not open \"" << e.name.native_file_string() << "\" for " << (e.in ? "reading" : "writing") << ".\n";
+		std::cerr << "\n\nError: could not open \"" << e.name.string() << "\" for " << (e.in ? "reading" : "writing") << ".\n";
 		return 1;
 	}
 	catch(boost::filesystem::filesystem_error& e) {
@@ -220,7 +220,7 @@ Thank you!\n";
 		return 1;
 	}
 	catch(parse_error& e) {
-		std::cerr << "\n\nParse error on line " << e.line << " in file \"" << e.file.native_file_string() << "\": " << e.reason << '\n';
+		std::cerr << "\n\nParse error on line " << e.line << " in file \"" << e.file.string() << "\": " << e.reason << '\n';
 		return 1;
 	}
 	catch(std::bad_alloc&) {
@@ -230,9 +230,9 @@ Thank you!\n";
 
 	// Errors that shouldn't happen:
 
-	catch(std::exception& e) { 
+	catch(std::exception& e) {
 		std::cerr << "\n\nAn error occurred: " << e.what() << ". " << error_message;
-		return 1; 
+		return 1;
 	}
 	catch(internal_error& e) {
 		std::cerr << "\n\nAn internal error occurred in " << e.file << "(" << e.line << "). " << error_message;

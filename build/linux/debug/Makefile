@@ -1,9 +1,7 @@
-BASE=/home/xouyang1/boost
-BOOST_VERSION=1_41
-BOOST_INCLUDE = $(BASE)/include
+BOOST_INCLUDE=/usr/lib/x86_64-linux-gnu/
 C_PLATFORM=-static -pthread
-GPP=g++
-C_OPTIONS= -g
-BOOST_LIB_VERSION=
+GPP=/usr/bin/g++
+C_OPTIONS= -O3 -g
 
 include ../../makefile_common
+# DO NOT DELETE
